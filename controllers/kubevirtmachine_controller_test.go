@@ -353,7 +353,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 
 		Expect(err).ShouldNot(HaveOccurred())
 
-		// should expect to re-enqueue while waiting for VMI to come online
+		// should expect to re-enqueue while waiting for VMI to come online.
 		Expect(out).To(Equal(ctrl.Result{RequeueAfter: 20 * time.Second}))
 
 		// should expect VM to be created with expected name
@@ -413,7 +413,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(out).To(Equal(ctrl.Result{Requeue: false, RequeueAfter: 0}))
 
-		//Check bootstrapData secret is deleted
+		// Check bootstrapData secret is deleted
 		machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
 		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-userdata"}
 		infraClusterClient, _, err := infraClusterMock.GenerateInfraClusterClient(kubevirtMachine.Spec.InfraClusterSecretRef, kubevirtMachine.Namespace, machineContext.Context)
@@ -422,7 +422,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 		err = infraClusterClient.Get(gocontext.Background(), machineBootstrapSecretReferenceKey, bootstrapDataSecret)
 		Expect(apierrors.IsNotFound(err)).To(BeTrue())
 
-		//Check finalizer is removed from machine
+		// Check finalizer is removed from machine
 		Expect(machineContext.Machine.ObjectMeta.Finalizers).To(BeEmpty())
 	})
 
@@ -445,14 +445,14 @@ var _ = Describe("reconcile a kubevirt machine", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 		Expect(out).To(Equal(ctrl.Result{Requeue: false, RequeueAfter: 0}))
 
-		//Check finalizer is removed from machine
+		// Check finalizer is removed from machine
 		Expect(machineContext.Machine.ObjectMeta.Finalizers).To(BeEmpty())
 	})
 
 	It("should update userdata correctly at KubevirtMachine reconcile", func() {
-		//Get Machine
-		//Get userdata secret name from machine
-		//Get userdata secret and assert equality to original secret
+		// Get Machine
+		// Get userdata secret name from machine
+		// Get userdata secret and assert equality to original secret
 		objects := []client.Object{
 			cluster,
 			kubevirtCluster,
