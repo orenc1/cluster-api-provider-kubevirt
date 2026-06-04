@@ -187,6 +187,9 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 		if virtualMachine.Labels == nil {
 			virtualMachine.Labels = map[string]string{}
 		}
+		if virtualMachine.Annotations == nil {
+			virtualMachine.Annotations = map[string]string{}
+		}
 		if virtualMachine.Spec.Template.ObjectMeta.Labels == nil {
 			virtualMachine.Spec.Template.ObjectMeta.Labels = map[string]string{}
 		}
@@ -197,6 +200,8 @@ func (m *Machine) Create(ctx gocontext.Context) error {
 
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNameLabel] = m.machineContext.KubevirtMachine.Name
 		virtualMachine.Spec.Template.ObjectMeta.Labels[infrav1.KubevirtMachineNamespaceLabel] = m.machineContext.KubevirtMachine.Namespace
+
+
 		return nil
 	}
 	if _, err := controllerutil.CreateOrUpdate(ctx, m.client, virtualMachine, mutateFn); err != nil {
