@@ -66,11 +66,22 @@ type KubevirtClusterSpec struct {
 	InfraClusterSecretRef *corev1.ObjectReference `json:"infraClusterSecretRef,omitempty"`
 }
 
+// KubevirtClusterInitializationStatus contains CAPI v1beta2 contract fields.
+type KubevirtClusterInitializationStatus struct {
+	// Provisioned indicates the infrastructure has been provisioned.
+	// +optional
+	Provisioned *bool `json:"provisioned,omitempty"`
+}
+
 // KubevirtClusterStatus defines the observed state of KubevirtCluster.
 type KubevirtClusterStatus struct {
 	// Ready denotes that the infrastructure is ready.
 	// +kubebuilder:default:=false
 	Ready bool `json:"ready"`
+
+	// Initialization tracks CAPI v1beta2 contract initialization fields.
+	// +optional
+	Initialization *KubevirtClusterInitializationStatus `json:"initialization,omitempty"`
 
 	// FailureDomains don't mean much in CAPD since it's all local, but we can see how the rest of cluster API
 	// will use this if we populate it.

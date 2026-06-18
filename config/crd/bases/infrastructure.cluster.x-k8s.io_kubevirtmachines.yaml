@@ -4742,6 +4742,16 @@ spec:
                   can be added as events to the Machine object and/or logged in the
                   controller's output.
                 type: string
+              initialization:
+                description: Initialization tracks CAPI v1beta2 contract initialization
+                  fields.
+                properties:
+                  provisioned:
+                    description: |-
+                      Provisioned indicates that the infrastructure has been provisioned.
+                      Required by CAPI v1beta2 Machine controller to proceed with providerID propagation.
+                    type: boolean
+                type: object
               loadBalancerConfigured:
                 description: |-
                   LoadBalancerConfigured denotes that the machine has been

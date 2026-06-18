@@ -260,6 +260,15 @@ spec:
                   FailureDomains don't mean much in CAPD since it's all local, but we can see how the rest of cluster API
                   will use this if we populate it.
                 type: object
+              initialization:
+                description: Initialization tracks CAPI v1beta2 contract initialization
+                  fields.
+                properties:
+                  provisioned:
+                    description: Provisioned indicates the infrastructure has been
+                      provisioned.
+                    type: boolean
+                type: object
               ready:
                 default: false
                 description: Ready denotes that the infrastructure is ready.

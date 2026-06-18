@@ -68,11 +68,23 @@ type VirtualMachineBootstrapCheckSpec struct {
 	CheckStrategy string `json:"checkStrategy,omitempty"`
 }
 
+// KubevirtMachineInitializationStatus tracks CAPI v1beta2 contract fields.
+type KubevirtMachineInitializationStatus struct {
+	// Provisioned indicates that the infrastructure has been provisioned.
+	// Required by CAPI v1beta2 Machine controller to proceed with providerID propagation.
+	// +optional
+	Provisioned *bool `json:"provisioned,omitempty"`
+}
+
 // KubevirtMachineStatus defines the observed state of KubevirtMachine.
 type KubevirtMachineStatus struct {
 	// Ready denotes that the machine is ready
 	// +kubebuilder:default=false
 	Ready bool `json:"ready"`
+
+	// Initialization tracks CAPI v1beta2 contract initialization fields.
+	// +optional
+	Initialization *KubevirtMachineInitializationStatus `json:"initialization,omitempty"`
 
 	// LoadBalancerConfigured denotes that the machine has been
 	// added to the load balancer
