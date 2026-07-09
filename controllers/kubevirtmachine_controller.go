@@ -259,6 +259,9 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
 		failureErr := capierrors.UpdateMachineError
 		ctx.KubevirtMachine.Status.FailureReason = &failureErr
 		ctx.KubevirtMachine.Status.FailureMessage = &terminalReason
+	} else {
+		ctx.KubevirtMachine.Status.FailureReason = nil
+		ctx.KubevirtMachine.Status.FailureMessage = nil
 	}
 
 	// Provision the underlying VM if not existing
