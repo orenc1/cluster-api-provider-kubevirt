@@ -24,9 +24,10 @@ import (
 
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta1"         //nolint SA1019
-	"sigs.k8s.io/cluster-api/util/deprecated/v1beta1/conditions" //nolint SA1019
-	"sigs.k8s.io/cluster-api/util/deprecated/v1beta1/patch"      //nolint SA1019
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
+	"sigs.k8s.io/cluster-api/util/conditions"
+	"sigs.k8s.io/cluster-api/util/patch"
 
 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
 )
@@ -59,23 +60,45 @@ func (c *MachineContext) String() string {
 
 // PatchKubevirtMachine patches the KubevirtMachine object and status.
 func (c *MachineContext) PatchKubevirtMachine(patchHelper *patch.Helper) error {
-	// Always update the readyCondition by summarizing the state of other conditions.
-	// A step counter is added to represent progress during the provisioning process (instead we are hiding the step counter during the deletion process).
-	conditions.SetSummary(c.KubevirtMachine,
-		conditions.WithConditions(
-			infrav1.VMProvisionedCondition,
-			infrav1.BootstrapExecSucceededCondition,
-		),
-	)
+	// Summarize Ready condition from sub-conditions.
+	subCondTypes := []string{
+		string(infrav1.VMProvisionedCondition),
+		string(infrav1.BootstrapExecSucceededCondition),
+	}
+	allTrue := true
+	var firstFalse *metav1.Condition
+	for _, ct := range subCondTypes {
+		if !conditions.IsTrue(c.KubevirtMachine, ct) {
+			allTrue = false
+			if cond := conditions.Get(c.KubevirtMachine, ct); cond != nil && cond.Status != metav1.ConditionTrue {
+				firstFalse = cond
+			}
+			break
+		}
+	}
+	if allTrue {
+		conditions.Set(c.KubevirtMachine, metav1.Condition{
+			Type:   string(clusterv1.ReadyV1Beta1Condition),
+			Status: metav1.ConditionTrue, Message: "Ready",
+			Reason: string(clusterv1.ReadyV1Beta1Condition),
+		})
+	} else if firstFalse != nil {
+		conditions.Set(c.KubevirtMachine, metav1.Condition{
+			Type:    string(clusterv1.ReadyV1Beta1Condition),
+			Status:  metav1.ConditionFalse,
+			Reason:  firstFalse.Reason,
+			Message: firstFalse.Message,
+		})
+	}
 
 	// Patch the object, ignoring conflicts on the conditions owned by this controller.
 	return patchHelper.Patch(
 		c.Context,
 		c.KubevirtMachine,
-		patch.WithOwnedConditions{Conditions: []clusterv1.ConditionType{
-			clusterv1.ReadyCondition,
-			infrav1.VMProvisionedCondition,
-			infrav1.BootstrapExecSucceededCondition,
+		patch.WithOwnedConditions{Conditions: []string{
+			string(clusterv1.ReadyV1Beta1Condition),
+			string(infrav1.VMProvisionedCondition),
+			string(infrav1.BootstrapExecSucceededCondition),
 		}},
 	)
 }

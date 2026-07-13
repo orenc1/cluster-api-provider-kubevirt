@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta1" //nolint SA1019
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 )
 
 const (
@@ -85,11 +85,11 @@ type KubevirtClusterStatus struct {
 
 	// FailureDomains don't mean much in CAPD since it's all local, but we can see how the rest of cluster API
 	// will use this if we populate it.
-	FailureDomains clusterv1.FailureDomains `json:"failureDomains,omitempty"`
+	FailureDomains []clusterv1.FailureDomain `json:"failureDomains,omitempty"`
 
 	// Conditions defines current service state of the KubevirtCluster.
 	// +optional
-	Conditions []clusterv1.Condition `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // APIEndpoint represents a reachable Kubernetes API endpoint.
@@ -151,11 +151,11 @@ type KubevirtCluster struct {
 	Status KubevirtClusterStatus `json:"status,omitempty"`
 }
 
-func (c *KubevirtCluster) GetConditions() clusterv1.Conditions {
+func (c *KubevirtCluster) GetConditions() []metav1.Condition {
 	return c.Status.Conditions
 }
 
-func (c *KubevirtCluster) SetConditions(conditions clusterv1.Conditions) {
+func (c *KubevirtCluster) SetConditions(conditions []metav1.Condition) {
 	c.Status.Conditions = conditions
 }
 

@@ -20,8 +20,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubevirtv1 "kubevirt.io/api/core/v1"
-	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta1" //nolint SA1019
-	"sigs.k8s.io/cluster-api/errors"                     //nolint SA1019
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
+	"sigs.k8s.io/cluster-api/errors"
 )
 
 const (
@@ -97,7 +97,7 @@ type KubevirtMachineStatus struct {
 
 	// Conditions defines current service state of the KubevirtMachine.
 	// +optional
-	Conditions clusterv1.Conditions `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// NodeUpdated denotes that the ProviderID is updated on Node of this KubevirtMachine
 	// +optional
@@ -158,11 +158,11 @@ type KubevirtMachine struct {
 	Status KubevirtMachineStatus `json:"status,omitempty"`
 }
 
-func (c *KubevirtMachine) GetConditions() clusterv1.Conditions {
+func (c *KubevirtMachine) GetConditions() []metav1.Condition {
 	return c.Status.Conditions
 }
 
-func (c *KubevirtMachine) SetConditions(conditions clusterv1.Conditions) {
+func (c *KubevirtMachine) SetConditions(conditions []metav1.Condition) {
 	c.Status.Conditions = conditions
 }
 
